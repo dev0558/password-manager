@@ -1,6 +1,6 @@
 # SecureVault Password Manager
 
-A production-ready desktop password manager built with Python and CustomTkinter, implementing NIST SP 800-63B Digital Identity Guidelines and industry-standard cryptographic practices.
+A  desktop password manager built with Python and CustomTkinter, implementing NIST SP 800-63B Digital Identity Guidelines and industry-standard cryptographic practices.
 
 ## Features
 
