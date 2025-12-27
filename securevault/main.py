@@ -604,10 +604,10 @@ class CardFrame(ctk.CTkFrame):
 class StrengthBar(ctk.CTkFrame):
     """Password strength indicator bar."""
 
-    def __init__(self, master, **kwargs):
-        super().__init__(master, height=8, fg_color=Colors.BG_LIGHT, corner_radius=4, **kwargs)
+    def __init__(self, master, height: int = 8, **kwargs):
+        super().__init__(master, height=height, fg_color=Colors.BG_LIGHT, corner_radius=4, **kwargs)
 
-        self.fill = ctk.CTkFrame(self, height=8, fg_color=Colors.DANGER, corner_radius=4)
+        self.fill = ctk.CTkFrame(self, height=height, fg_color=Colors.DANGER, corner_radius=4)
         self.fill.place(relx=0, rely=0, relwidth=0, relheight=1)
 
     def set_strength(self, score: int):
@@ -886,16 +886,102 @@ class VaultModule(ctk.CTkFrame):
             widget.destroy()
 
         if not self.filtered_entries:
-            ctk.CTkLabel(
-                self.list_frame,
-                text="No passwords stored yet.\nClick '+ Add Entry' to get started.",
-                text_color=Colors.TEXT_SECONDARY,
-                font=ctk.CTkFont(size=14)
-            ).pack(pady=50)
+            self._render_welcome_screen()
             return
 
         for entry in self.filtered_entries:
             self._create_entry_card(entry)
+
+    def _render_welcome_screen(self):
+        """Render an attractive welcome screen for new users."""
+        welcome_container = ctk.CTkFrame(self.list_frame, fg_color="transparent")
+        welcome_container.pack(fill="both", expand=True, pady=20)
+
+        # Welcome card
+        welcome_card = CardFrame(welcome_container)
+        welcome_card.pack(fill="x", pady=(0, 20))
+
+        welcome_content = ctk.CTkFrame(welcome_card, fg_color="transparent")
+        welcome_content.pack(fill="x", padx=30, pady=30)
+
+        ctk.CTkLabel(
+            welcome_content,
+            text="Welcome to SecureVault",
+            font=ctk.CTkFont(size=28, weight="bold"),
+            text_color=Colors.PRIMARY
+        ).pack(anchor="w", pady=(0, 10))
+
+        ctk.CTkLabel(
+            welcome_content,
+            text="Your personal fortress for passwords and sensitive credentials.",
+            font=ctk.CTkFont(size=14),
+            text_color=Colors.TEXT_SECONDARY
+        ).pack(anchor="w", pady=(0, 20))
+
+        # Feature highlights
+        features = [
+            ("Military-Grade Encryption", "Your passwords are protected with AES-256 encryption and PBKDF2 key derivation with 600,000 iterations."),
+            ("Zero Knowledge Architecture", "Your master password never leaves your device. Only you can access your vault."),
+            ("Built for Security Professionals", "Compliant with NIST SP 800-63B guidelines for digital identity protection."),
+        ]
+
+        for title, desc in features:
+            feature_frame = ctk.CTkFrame(welcome_content, fg_color=Colors.BG_LIGHT, corner_radius=8)
+            feature_frame.pack(fill="x", pady=(0, 10))
+
+            feature_inner = ctk.CTkFrame(feature_frame, fg_color="transparent")
+            feature_inner.pack(fill="x", padx=15, pady=12)
+
+            ctk.CTkLabel(
+                feature_inner,
+                text=title,
+                font=ctk.CTkFont(size=14, weight="bold"),
+                text_color=Colors.CYAN,
+                anchor="w"
+            ).pack(fill="x")
+
+            ctk.CTkLabel(
+                feature_inner,
+                text=desc,
+                font=ctk.CTkFont(size=12),
+                text_color=Colors.TEXT_SECONDARY,
+                anchor="w",
+                wraplength=500
+            ).pack(fill="x", pady=(3, 0))
+
+        # Getting started section
+        ctk.CTkLabel(
+            welcome_content,
+            text="Getting Started",
+            font=ctk.CTkFont(size=18, weight="bold"),
+            text_color=Colors.TEXT_PRIMARY
+        ).pack(anchor="w", pady=(20, 10))
+
+        steps = [
+            "Click the '+ Add Entry' button above to store your first password",
+            "Use the Password Generator to create strong, unique passwords",
+            "Check the Strength Analyzer to evaluate your existing passwords",
+        ]
+
+        for i, step in enumerate(steps, 1):
+            step_frame = ctk.CTkFrame(welcome_content, fg_color="transparent")
+            step_frame.pack(fill="x", pady=(0, 8))
+
+            ctk.CTkLabel(
+                step_frame,
+                text=f"{i}.",
+                font=ctk.CTkFont(size=14, weight="bold"),
+                text_color=Colors.PRIMARY,
+                width=25
+            ).pack(side="left")
+
+            ctk.CTkLabel(
+                step_frame,
+                text=step,
+                font=ctk.CTkFont(size=13),
+                text_color=Colors.TEXT_SECONDARY,
+                anchor="w"
+            ).pack(side="left", fill="x")
 
     def _create_entry_card(self, entry: PasswordEntry):
         """Create a card for a password entry."""
@@ -1450,23 +1536,45 @@ class AnalyzerModule(ctk.CTkFrame):
 
     def _create_widgets(self):
         """Create analyzer module widgets."""
+        # Header section
+        header_frame = ctk.CTkFrame(self, fg_color="transparent")
+        header_frame.pack(fill="x", pady=(0, 20))
+
         ctk.CTkLabel(
-            self, text="Password Strength Analyzer",
+            header_frame, text="Password Strength Analyzer",
             font=ctk.CTkFont(size=24, weight="bold"),
             text_color=Colors.TEXT_PRIMARY
-        ).pack(anchor="w", pady=(0, 20))
+        ).pack(anchor="w")
+
+        ctk.CTkLabel(
+            header_frame,
+            text="Discover how secure your passwords really are. Get instant feedback and actionable recommendations.",
+            font=ctk.CTkFont(size=13),
+            text_color=Colors.TEXT_SECONDARY,
+            wraplength=600
+        ).pack(anchor="w", pady=(5, 0))
 
         card = CardFrame(self)
         card.pack(fill="x")
 
         content = ctk.CTkFrame(card, fg_color="transparent")
-        content.pack(fill="x", padx=20, pady=20)
+        content.pack(fill="x", padx=25, pady=25)
 
-        # Password input
+        # Password input with better description
+        input_header = ctk.CTkFrame(content, fg_color="transparent")
+        input_header.pack(fill="x", pady=(0, 10))
+
         ctk.CTkLabel(
-            content, text="Enter Password to Analyze:",
-            text_color=Colors.TEXT_SECONDARY
-        ).pack(anchor="w", pady=(0, 5))
+            input_header, text="Test Your Password",
+            font=ctk.CTkFont(size=16, weight="bold"),
+            text_color=Colors.TEXT_PRIMARY
+        ).pack(anchor="w")
+
+        ctk.CTkLabel(
+            input_header, text="Type or paste any password to see a detailed security analysis",
+            text_color=Colors.TEXT_SECONDARY,
+            font=ctk.CTkFont(size=12)
+        ).pack(anchor="w")
 
         input_frame = ctk.CTkFrame(content, fg_color="transparent")
         input_frame.pack(fill="x", pady=(0, 20))
@@ -1625,23 +1733,46 @@ class BruteForceModule(ctk.CTkFrame):
 
     def _create_widgets(self):
         """Create brute force calculator widgets."""
+        # Header section
+        header_frame = ctk.CTkFrame(self, fg_color="transparent")
+        header_frame.pack(fill="x", pady=(0, 20))
+
         ctk.CTkLabel(
-            self, text="Brute Force Calculator",
+            header_frame, text="Brute Force Time Calculator",
             font=ctk.CTkFont(size=24, weight="bold"),
             text_color=Colors.TEXT_PRIMARY
-        ).pack(anchor="w", pady=(0, 20))
+        ).pack(anchor="w")
+
+        ctk.CTkLabel(
+            header_frame,
+            text="See how long it would take attackers to crack your password across different attack scenarios.",
+            font=ctk.CTkFont(size=13),
+            text_color=Colors.TEXT_SECONDARY,
+            wraplength=600
+        ).pack(anchor="w", pady=(5, 0))
 
         card = CardFrame(self)
         card.pack(fill="both", expand=True)
 
         content = ctk.CTkFrame(card, fg_color="transparent")
-        content.pack(fill="both", expand=True, padx=20, pady=20)
+        content.pack(fill="both", expand=True, padx=25, pady=25)
 
-        # Password input
+        # Password input with better description
+        input_header = ctk.CTkFrame(content, fg_color="transparent")
+        input_header.pack(fill="x", pady=(0, 10))
+
         ctk.CTkLabel(
-            content, text="Enter Password:",
-            text_color=Colors.TEXT_SECONDARY
-        ).pack(anchor="w", pady=(0, 5))
+            input_header, text="Enter a Password to Test",
+            font=ctk.CTkFont(size=16, weight="bold"),
+            text_color=Colors.TEXT_PRIMARY
+        ).pack(anchor="w")
+
+        ctk.CTkLabel(
+            input_header,
+            text="We will calculate crack times from basic online attacks to nation-state level resources",
+            text_color=Colors.TEXT_SECONDARY,
+            font=ctk.CTkFont(size=12)
+        ).pack(anchor="w")
 
         input_frame = ctk.CTkFrame(content, fg_color="transparent")
         input_frame.pack(fill="x", pady=(0, 20))
@@ -1781,65 +1912,80 @@ class NISTGuidelinesModule(ctk.CTkFrame):
         "recommended": [
             {
                 "title": "Minimum Length of 8 Characters",
-                "description": "Passwords should be at least 8 characters. Longer passwords (15+) are encouraged for higher security."
+                "description": "Passwords should be at least 8 characters. Longer passwords (15+) are encouraged for higher security.",
+                "why": "Length is the most important factor in password strength. Each additional character exponentially increases crack time."
             },
             {
                 "title": "Maximum Length of 64+ Characters",
-                "description": "Allow passwords up to at least 64 characters to support passphrases."
+                "description": "Allow passwords up to at least 64 characters to support passphrases.",
+                "why": "Passphrases like 'correct-horse-battery-staple' are both memorable and extremely secure."
             },
             {
                 "title": "Support All ASCII Characters",
-                "description": "Allow all printable ASCII characters, including spaces and Unicode."
+                "description": "Allow all printable ASCII characters, including spaces and Unicode.",
+                "why": "Restricting characters reduces the password space and frustrates users who want to use complex passwords."
             },
             {
                 "title": "Check Against Compromised Passwords",
-                "description": "Verify passwords against lists of commonly-used, expected, or compromised passwords."
+                "description": "Verify passwords against lists of commonly-used, expected, or compromised passwords.",
+                "why": "Attackers use dictionaries of leaked passwords. Even a 'strong-looking' password is weak if it has been breached."
             },
             {
                 "title": "No Mandatory Complexity Rules",
-                "description": "Don't require mixtures of character types. Users create weaker passwords with forced complexity."
+                "description": "Don't require mixtures of character types. Users create weaker passwords with forced complexity.",
+                "why": "P@ssw0rd! meets complexity rules but is easily guessed. Let users choose their own approach."
             },
             {
                 "title": "No Periodic Password Changes",
-                "description": "Don't force regular password expiration unless there's evidence of compromise."
+                "description": "Don't force regular password expiration unless there's evidence of compromise.",
+                "why": "Forced changes lead to predictable patterns like Summer2024 to Fall2024. Change only when necessary."
             },
             {
                 "title": "Offer Password Strength Meter",
-                "description": "Provide real-time feedback to help users create stronger passwords."
+                "description": "Provide real-time feedback to help users create stronger passwords.",
+                "why": "Users make better choices when they can see the impact of their decisions in real-time."
             },
             {
                 "title": "Allow Paste in Password Fields",
-                "description": "Support paste functionality to enable password managers."
+                "description": "Support paste functionality to enable password managers.",
+                "why": "Blocking paste discourages password managers and encourages weak, memorable passwords."
             },
             {
                 "title": "Use Proper Password Hashing",
-                "description": "Store passwords using approved algorithms like PBKDF2, bcrypt, scrypt, or Argon2."
+                "description": "Store passwords using approved algorithms like PBKDF2, bcrypt, scrypt, or Argon2.",
+                "why": "These algorithms are designed to be slow, making brute-force attacks computationally expensive."
             },
             {
                 "title": "Salt All Password Hashes",
-                "description": "Use a random salt of at least 32 bits for each stored password."
+                "description": "Use a random salt of at least 32 bits for each stored password.",
+                "why": "Salts prevent rainbow table attacks and ensure identical passwords have different hashes."
             }
         ],
         "deprecated": [
             {
                 "title": "Composition Rules",
-                "description": "Requiring uppercase, lowercase, numbers, and symbols often leads to predictable patterns."
+                "description": "Requiring uppercase, lowercase, numbers, and symbols often leads to predictable patterns.",
+                "why": "Users typically capitalize the first letter and add 1! at the end. Attackers know this."
             },
             {
                 "title": "Password Hints",
-                "description": "Password hints can be exploited by attackers and should not be used."
+                "description": "Password hints can be exploited by attackers and should not be used.",
+                "why": "Hints often reveal too much information. 'My dog's name' tells attackers exactly what to guess."
             },
             {
                 "title": "Security Questions",
-                "description": "Knowledge-based authentication questions are easily researched or guessed."
+                "description": "Knowledge-based authentication questions are easily researched or guessed.",
+                "why": "Your mother's maiden name is public record. Your first pet's name is probably on social media."
             },
             {
                 "title": "Forced Periodic Changes",
-                "description": "Mandatory password expiration causes users to make minimal, predictable changes."
+                "description": "Mandatory password expiration causes users to make minimal, predictable changes.",
+                "why": "Research shows forced rotation decreases security by encouraging simple, incrementable passwords."
             },
             {
-                "title": "SMS-Based 2FA",
-                "description": "SMS is vulnerable to interception and SIM swapping. Use authenticator apps instead."
+                "title": "SMS-Based Two-Factor Authentication",
+                "description": "SMS is vulnerable to interception and SIM swapping. Use authenticator apps instead.",
+                "why": "Attackers can hijack phone numbers through social engineering of mobile carriers."
             }
         ]
     }
@@ -1851,16 +1997,23 @@ class NISTGuidelinesModule(ctk.CTkFrame):
 
     def _create_widgets(self):
         """Create NIST guidelines widgets."""
-        ctk.CTkLabel(
-            self, text="NIST SP 800-63B Guidelines",
-            font=ctk.CTkFont(size=24, weight="bold"),
-            text_color=Colors.TEXT_PRIMARY
-        ).pack(anchor="w", pady=(0, 10))
+        # Header section
+        header_frame = ctk.CTkFrame(self, fg_color="transparent")
+        header_frame.pack(fill="x", pady=(0, 20))
 
         ctk.CTkLabel(
-            self, text="Digital Identity Guidelines - Authentication and Lifecycle Management",
-            text_color=Colors.TEXT_SECONDARY
-        ).pack(anchor="w", pady=(0, 20))
+            header_frame, text="NIST Password Guidelines",
+            font=ctk.CTkFont(size=24, weight="bold"),
+            text_color=Colors.TEXT_PRIMARY
+        ).pack(anchor="w")
+
+        ctk.CTkLabel(
+            header_frame,
+            text="Modern password security based on NIST Special Publication 800-63B. These guidelines represent the current best practices for digital identity and authentication.",
+            font=ctk.CTkFont(size=13),
+            text_color=Colors.TEXT_SECONDARY,
+            wraplength=650
+        ).pack(anchor="w", pady=(5, 0))
 
         # Scrollable content
         scroll = ctk.CTkScrollableFrame(self, fg_color="transparent")
@@ -1871,16 +2024,19 @@ class NISTGuidelinesModule(ctk.CTkFrame):
         rec_card.pack(fill="x", pady=(0, 20))
 
         rec_header = ctk.CTkFrame(rec_card, fg_color="transparent")
-        rec_header.pack(fill="x", padx=20, pady=(20, 10))
+        rec_header.pack(fill="x", padx=25, pady=(25, 15))
+
+        # Using text instead of emoji
+        rec_badge = ctk.CTkFrame(rec_header, fg_color=Colors.SUCCESS, corner_radius=4)
+        rec_badge.pack(side="left", padx=(0, 12))
+        ctk.CTkLabel(
+            rec_badge, text="RECOMMENDED",
+            font=ctk.CTkFont(size=10, weight="bold"),
+            text_color=Colors.BG_DARK
+        ).pack(padx=8, pady=3)
 
         ctk.CTkLabel(
-            rec_header, text="✓",
-            font=ctk.CTkFont(size=20),
-            text_color=Colors.SUCCESS
-        ).pack(side="left", padx=(0, 10))
-
-        ctk.CTkLabel(
-            rec_header, text="Recommended Practices",
+            rec_header, text="What You Should Do",
             font=ctk.CTkFont(size=18, weight="bold"),
             text_color=Colors.TEXT_PRIMARY
         ).pack(side="left")
@@ -1889,23 +2045,26 @@ class NISTGuidelinesModule(ctk.CTkFrame):
             self._create_guideline_item(rec_card, guideline, Colors.SUCCESS)
 
         # Add bottom padding
-        ctk.CTkFrame(rec_card, fg_color="transparent", height=10).pack()
+        ctk.CTkFrame(rec_card, fg_color="transparent", height=15).pack()
 
         # Deprecated practices
         dep_card = CardFrame(scroll)
         dep_card.pack(fill="x")
 
         dep_header = ctk.CTkFrame(dep_card, fg_color="transparent")
-        dep_header.pack(fill="x", padx=20, pady=(20, 10))
+        dep_header.pack(fill="x", padx=25, pady=(25, 15))
+
+        # Using text instead of emoji
+        dep_badge = ctk.CTkFrame(dep_header, fg_color=Colors.DANGER, corner_radius=4)
+        dep_badge.pack(side="left", padx=(0, 12))
+        ctk.CTkLabel(
+            dep_badge, text="AVOID",
+            font=ctk.CTkFont(size=10, weight="bold"),
+            text_color=Colors.TEXT_PRIMARY
+        ).pack(padx=8, pady=3)
 
         ctk.CTkLabel(
-            dep_header, text="✗",
-            font=ctk.CTkFont(size=20),
-            text_color=Colors.DANGER
-        ).pack(side="left", padx=(0, 10))
-
-        ctk.CTkLabel(
-            dep_header, text="Deprecated Practices",
+            dep_header, text="Outdated Practices to Avoid",
             font=ctk.CTkFont(size=18, weight="bold"),
             text_color=Colors.TEXT_PRIMARY
         ).pack(side="left")
@@ -1914,27 +2073,50 @@ class NISTGuidelinesModule(ctk.CTkFrame):
             self._create_guideline_item(dep_card, guideline, Colors.DANGER)
 
         # Add bottom padding
-        ctk.CTkFrame(dep_card, fg_color="transparent", height=10).pack()
+        ctk.CTkFrame(dep_card, fg_color="transparent", height=15).pack()
 
     def _create_guideline_item(self, parent, guideline: Dict, accent_color: str):
         """Create a guideline item."""
         item = ctk.CTkFrame(parent, fg_color=Colors.BG_LIGHT, corner_radius=8)
-        item.pack(fill="x", padx=20, pady=(0, 10))
+        item.pack(fill="x", padx=25, pady=(0, 12))
 
         content = ctk.CTkFrame(item, fg_color="transparent")
-        content.pack(fill="x", padx=15, pady=12)
+        content.pack(fill="x", padx=18, pady=15)
 
+        # Title
         ctk.CTkLabel(
             content, text=guideline["title"],
-            font=ctk.CTkFont(weight="bold"),
+            font=ctk.CTkFont(size=14, weight="bold"),
             text_color=Colors.TEXT_PRIMARY, anchor="w"
         ).pack(fill="x")
 
+        # Description
         ctk.CTkLabel(
             content, text=guideline["description"],
             text_color=Colors.TEXT_SECONDARY,
-            anchor="w", justify="left", wraplength=600
+            anchor="w", justify="left", wraplength=580,
+            font=ctk.CTkFont(size=13)
         ).pack(fill="x", pady=(5, 0))
+
+        # Why it matters section
+        why_frame = ctk.CTkFrame(content, fg_color=Colors.BG_MEDIUM, corner_radius=6)
+        why_frame.pack(fill="x", pady=(10, 0))
+
+        why_content = ctk.CTkFrame(why_frame, fg_color="transparent")
+        why_content.pack(fill="x", padx=12, pady=10)
+
+        ctk.CTkLabel(
+            why_content, text="Why it matters:",
+            font=ctk.CTkFont(size=11, weight="bold"),
+            text_color=accent_color, anchor="w"
+        ).pack(fill="x")
+
+        ctk.CTkLabel(
+            why_content, text=guideline["why"],
+            text_color=Colors.TEXT_SECONDARY,
+            anchor="w", justify="left", wraplength=540,
+            font=ctk.CTkFont(size=12)
+        ).pack(fill="x", pady=(3, 0))
 
 
 # =============================================================================
