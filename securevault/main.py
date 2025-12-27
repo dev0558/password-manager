@@ -604,10 +604,10 @@ class CardFrame(ctk.CTkFrame):
 class StrengthBar(ctk.CTkFrame):
     """Password strength indicator bar."""
 
-    def __init__(self, master, **kwargs):
-        super().__init__(master, height=8, fg_color=Colors.BG_LIGHT, corner_radius=4, **kwargs)
+    def __init__(self, master, height: int = 8, **kwargs):
+        super().__init__(master, height=height, fg_color=Colors.BG_LIGHT, corner_radius=4, **kwargs)
 
-        self.fill = ctk.CTkFrame(self, height=8, fg_color=Colors.DANGER, corner_radius=4)
+        self.fill = ctk.CTkFrame(self, height=height, fg_color=Colors.DANGER, corner_radius=4)
         self.fill.place(relx=0, rely=0, relwidth=0, relheight=1)
 
     def set_strength(self, score: int):
